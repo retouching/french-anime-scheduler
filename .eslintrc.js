@@ -19,6 +19,8 @@ module.exports = {
     semi: 0,
     'space-before-function-paren': 0,
     '@typescript-eslint/space-before-function-paren': ['error', 'never'],
-    '@typescript-eslint/prefer-nullish-coalescing': 0
+    '@typescript-eslint/prefer-nullish-coalescing': 0,
+    'max-len': ['error', 130],
+    'max-lines': ['error', 300]
   }
 };
