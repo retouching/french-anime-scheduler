@@ -37,20 +37,27 @@ module.exports = {
       {
         selector: ['interface'],
         prefix: ['I'],
-        format: ['StrictPascalCase']
+        format: ['PascalCase']
+      },
+      {
+        selector: ['class'],
+        format: ['PascalCase']
       },
       {
         selector: ['default'],
         format: ['camelCase']
       },
       {
-        selector: ['typeProperty'],
+        selector: ['typeProperty', 'classProperty'],
         format: ['UPPER_CASE', 'camelCase', 'PascalCase']
       },
       {
         selector: ['objectLiteralProperty'],
         format: null
       }
-    ]
+    ],
+    '@typescript-eslint/no-extraneous-class': ['error', {
+      allowStaticOnly: true
+    }]
   }
 };

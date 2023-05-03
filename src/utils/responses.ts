@@ -1,6 +1,9 @@
 export function asJSON(
-  message: string | null, data: Record<string, any> | null, status: number
+  message: string | null = null,
+  data: Record<string, any> | null = null,
+  status: number = 200
 ): Response {
+  if (!status) status = 200;
   if (!message && !data) throw new Error('You must set message or data');
   if (!message && status > 399) throw new Error('Error response must include message');
 

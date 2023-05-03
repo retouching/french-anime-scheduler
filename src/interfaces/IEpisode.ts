@@ -4,4 +4,5 @@ export default interface IEpisode {
   episode: number | null;
   episodeUrl: string;
   animeUrl: string;
+  image: string | null;
 };
