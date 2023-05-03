@@ -15,8 +15,4 @@ jobs:
         with:
           node-version: 16
       - run: npm i
-      - uses: sibiraj-s/action-eslint@v2
-        with:
-          eslint-args: '--ignore-path=.gitignore --quiet'
-          extensions: 'ts,tsx'
-          annotations: true
+      - run: npm run eslint
