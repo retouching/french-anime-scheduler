@@ -16,7 +16,7 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler publish",
-    "dev": "wrangler dev --test-scheduled",
+    "dev": "wrangler dev --test-scheduled -l --log-level debug --ip 127.0.0.1",
     "eslint": "eslint src/"
   },
   "dependencies": {

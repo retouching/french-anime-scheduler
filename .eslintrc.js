@@ -22,7 +22,7 @@ module.exports = {
     '@typescript-eslint/prefer-nullish-coalescing': 0,
     'max-len': ['error', 130],
     'max-lines': ['error', 300],
-    'no-empty': ['error', { 'allowEmptyCatch': true }],
+    'no-empty': ['error', { allowEmptyCatch: true }],
     'quote-props': ['error', 'as-needed'],
     '@typescript-eslint/member-delimiter-style': [
       'error',
@@ -30,30 +30,6 @@ module.exports = {
         multiline: { delimiter: 'semi', requireLast: true },
         singleline: { delimiter: 'semi', requireLast: false },
         multilineDetection: 'brackets'
-      }
-    ],
-    '@typescript-eslint/naming-convention': [
-      'error',
-      {
-        selector: ['interface'],
-        prefix: ['I'],
-        format: ['PascalCase']
-      },
-      {
-        selector: ['class'],
-        format: ['PascalCase']
-      },
-      {
-        selector: ['default'],
-        format: ['camelCase']
-      },
-      {
-        selector: ['typeProperty', 'classProperty'],
-        format: ['UPPER_CASE', 'camelCase', 'PascalCase']
-      },
-      {
-        selector: ['objectLiteralProperty'],
-        format: null
       }
     ],
     '@typescript-eslint/no-extraneous-class': ['error', {

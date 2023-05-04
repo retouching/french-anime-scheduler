@@ -1,6 +1,7 @@
 import { Router, type RouterType } from 'itty-router';
 import type IEnvironment from './interfaces/IEnvironment';
 import { asJSON } from './utils/responses';
+import episodes from './schedulers/episodes';
 
 function initRouter(): RouterType {
   const router = Router();
@@ -14,6 +15,9 @@ async function handleRequest(request: Request, env: IEnvironment, ctx: Execution
 }
 
 function handleScheduler(controller: ScheduledController, env: IEnvironment, ctx: ExecutionContext): void {
+  ctx.waitUntil(Promise.allSettled([
+    episodes(controller, env, ctx)
+  ]));
 }
 
 export default {

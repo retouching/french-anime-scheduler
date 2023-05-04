@@ -1,5 +1,4 @@
-import type IEpisode from '../interfaces/IEpisode';
-import type IMovie from '../interfaces/IMovie';
+import { type IMovie, type IEpisode } from '../interfaces/IItems';
 
 export default class ADN {
   private static readonly BASE_URL = 'https://gw.api.animationdigitalnetwork.fr';
@@ -24,26 +23,35 @@ export default class ADN {
     const episodes: Array<IMovie | IEpisode> = [];
 
     for (const episodeData of data.videos) {
-      if (new Date(episodeData.releaseDate) > new Date()) continue;
+      if (new Date(episodeData.releaseDate) < new Date()) continue;
+      if (![...this.EPISODE_TYPES, ...this.MOVIE_TYPES].includes(episodeData.type)) continue;
+
+      let shortNumber = episodeData.shortNumber;
+      if (shortNumber) {
+        shortNumber = shortNumber.replace(/[^ 0-9]/g, '').split(' ').pop();
+      }
+      if (!shortNumber) shortNumber = null;
+      else shortNumber = (shortNumber.includes('.') ? parseFloat : parseInt)(shortNumber);
 
       episodes.push({
         id: `adn:${episodeData.id as string}`,
         anime: episodeData.show.title,
+        animeId: episodeData.show.id,
         episodeUrl: episodeData.url,
         animeUrl: episodeData.show.url,
-        image: episodeData.image2x || episodeData.image || null,
+        animeDescription: episodeData.show.summary || 'Aucune description disponible pour le moment',
+        animeImage: episodeData.show.image2x || episodeData.show.image || null,
+        outDate: new Date(episodeData.releaseDate),
+        animeYear: parseInt(episodeData.show.firstReleaseYear, 10) || currentDate.getFullYear(),
         ...(this.EPISODE_TYPES.includes(episodeData.type)
           ? {
-              episode: episodeData.shortNumber
-                ? parseInt(
-                  episodeData.shortNumber, 10
-                ) || null
-                : null
+              type: episodeData.type === 'EPS' ? 'EPISODE' : 'OAV',
+              episode: shortNumber
             }
           : {}),
         ...(this.MOVIE_TYPES.includes(episodeData.type)
           ? {
-              year: parseInt(episodeData.show.firstReleaseYear, 10) || currentDate.getFullYear()
+              type: 'MOVIE'
             }
           : {})
       } as any);
