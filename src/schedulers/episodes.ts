@@ -62,7 +62,7 @@ export default async function episodes(
   }
 
   const sortedEpisodesValues = Object.values(sortedEpisodes);
-  sortedEpisodesValues.sort((a: any, b: any) => a.date - b.date);
+  sortedEpisodesValues.sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
 
   if (sortedEpisodesValues.length > 0) {
     const webhooks: Array<Record<string, any>> = [];
@@ -118,7 +118,6 @@ export default async function episodes(
     );
 
     for (const chunkedWebhook of chunkedWebhooks) {
-      console.log(chunkedWebhook);
       await webhook.send(WEBHOOK_URL, { embeds: chunkedWebhook });
     }
   }

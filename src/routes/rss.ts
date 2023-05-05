@@ -10,7 +10,7 @@ export default async function rss(
   let episodesAnnounced: Array<IMovie | IEpisode> = await DB.get('announced', 'json');
   if (!episodesAnnounced) episodesAnnounced = [];
 
-  episodesAnnounced.sort((a: any, b: any) => b.date - a.date);
+  episodesAnnounced.sort((a: any, b: any) => new Date(b.outDate).getTime() - new Date(a.outDate).getTime());
 
   const currentUrl = new URL(request.url);
 
