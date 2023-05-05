@@ -5,7 +5,7 @@ export default class Crunchyroll {
   private static readonly APP_BASIC_AUTH = 'Basic c2ZjOWYtLXEyYzJ2YWE1eW1zbHo6cThiVk5SYmp2c1g5ZGJwdDV5eTl5TXhjakNRMXgteU0=';
   private static readonly API_BASE_URL = 'https://beta-api.crunchyroll.com';
   private static readonly FRONT_BASE_URL = 'https://www.crunchyroll.com';
-  private static readonly FRENCH_LANG_CODE = 'fr-fr';
+  private static readonly FRENCH_LANG_CODE = 'fr-FR';
   private readonly db: KVNamespace;
 
   public constructor(db: KVNamespace) {
@@ -40,8 +40,9 @@ export default class Crunchyroll {
 
   public async getObjectInfos(...ids: string[]): Promise<Array<Record<string, any>>> {
     const session = await this.getSessionToken();
+
     const req = await fetch(
-      `${Crunchyroll.API_BASE_URL}/content/v2/cms/objects/${ids.join(',')}?locale=fr-FR`, {
+      `${Crunchyroll.API_BASE_URL}/content/v2/cms/objects/${ids.join(',')}?locale=${Crunchyroll.FRENCH_LANG_CODE}`, {
         headers: new Headers({
           Authorization: `Bearer ${session}`,
           'User-Agent': Crunchyroll.APP_USER_AGENT
@@ -59,7 +60,8 @@ export default class Crunchyroll {
   public async getLatestEpisodes(): Promise<any> {
     const session = await this.getSessionToken();
     const req = await fetch(
-      `${Crunchyroll.API_BASE_URL}/content/v2/discover/browse?n=1000&sort_by=newly_added&locale=fr-FR&type=episode`, {
+      `${Crunchyroll.API_BASE_URL}/content/v2/discover/` +
+      `browse?n=100&sort_by=newly_added&locale=${Crunchyroll.FRENCH_LANG_CODE}&type=episode`, {
         headers: new Headers({
           Authorization: `Bearer ${session}`,
           'User-Agent': Crunchyroll.APP_USER_AGENT
@@ -76,14 +78,14 @@ export default class Crunchyroll {
       if (!e.new) return false;
       if (new Date().getTime() > (new Date(e.last_public).getTime() + 1000 * 60 * 60 * 24)) return false;
       if (
-        e.episode_metadata.audio_locale.toLowerCase() !== Crunchyroll.FRENCH_LANG_CODE &&
-        !e.episode_metadata.subtitle_locales.map((l: string) => l.toLowerCase()).includes(Crunchyroll.FRENCH_LANG_CODE)
+        e.episode_metadata.audio_locale !== Crunchyroll.FRENCH_LANG_CODE &&
+        !e.episode_metadata.subtitle_locales.includes(Crunchyroll.FRENCH_LANG_CODE)
       ) return false;
       return true;
     });
 
     if (episodesData.length > 0) {
-      const animes = await this.getObjectInfos(
+      const objects = await this.getObjectInfos(
         ...([
           ...new Set(episodesData.map((e: any) => e.episode_metadata.series_id)),
           ...new Set(episodesData.map((e: any) => e.episode_metadata.season_id))
@@ -91,8 +93,8 @@ export default class Crunchyroll {
       );
 
       for (const episodeData of episodesData) {
-        const anime = animes.find((a: any) => a.id === episodeData.episode_metadata.series_id);
-        const season = animes.find((a: any) => a.id === episodeData.episode_metadata.season_id);
+        const anime = objects.find((a: any) => a.id === episodeData.episode_metadata.series_id);
+        const season = objects.find((a: any) => a.id === episodeData.episode_metadata.season_id);
 
         if (!anime || !season) continue;
 

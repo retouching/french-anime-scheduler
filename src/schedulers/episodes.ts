@@ -35,7 +35,7 @@ export default async function episodes(
       if (WEBHOOK_URL) {
         if (episode.type === 'EPISODE' || episode.type === 'OAV') {
           if (sortedEpisodes[`${episode.type as string}:${episode.animeId as string}`]) {
-            sortedEpisodes[episode.animeId].episodes.push({
+            sortedEpisodes[`${episode.type as string}:${episode.animeId as string}`].episodes.push({
               number: episode.episode || 1,
               url: episode.episodeUrl
             });
@@ -61,10 +61,13 @@ export default async function episodes(
     }
   }
 
-  if (Object.values(sortedEpisodes).length > 0) {
+  const sortedEpisodesValues = Object.values(sortedEpisodes);
+  sortedEpisodesValues.sort((a: any, b: any) => a.date - b.date);
+
+  if (sortedEpisodesValues.length > 0) {
     const webhooks: Array<Record<string, any>> = [];
 
-    for (const sortedEpisode of Object.values(sortedEpisodes)) {
+    for (const sortedEpisode of sortedEpisodesValues) {
       const webhook = {
         title: `${sortedEpisode.title as string} (${sortedEpisode.year as string})`,
         description: sortedEpisode.description,
@@ -111,10 +114,11 @@ export default async function episodes(
     }
 
     const chunkedWebhooks = [].concat.apply([],
-      webhooks.map((_, i) => i % 10 ? [] : [webhooks.slice(i, i + 10)]) as any
+      webhooks.map((_, i) => i % 5 ? [] : [webhooks.slice(i, i + 5)]) as any
     );
 
     for (const chunkedWebhook of chunkedWebhooks) {
+      console.log(chunkedWebhook);
       await webhook.send(WEBHOOK_URL, { embeds: chunkedWebhook });
     }
   }

@@ -2,9 +2,11 @@ import { Router, type RouterType } from 'itty-router';
 import type IEnvironment from './interfaces/IEnvironment';
 import { asJSON } from './utils/responses';
 import episodes from './schedulers/episodes';
+import rss from './routes/rss';
 
 function initRouter(): RouterType {
   const router = Router();
+  router.get('/rss', rss);
   router.all('*', () => asJSON('Not found', null, 404));
   return router;
 }
