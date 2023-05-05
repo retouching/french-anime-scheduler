@@ -21,7 +21,7 @@ export interface IEpisode {
   anime: string;
   animeId: string;
   animeYear: number;
-  episode: number | null;
+  episode: number | string | null;
   episodeUrl: string;
   animeUrl: string;
   animeDescription: string | null;

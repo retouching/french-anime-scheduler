@@ -1,6 +1,7 @@
 import type IEnvironment from '../interfaces/IEnvironment';
 import { type IEpisode, type IMovie } from '../interfaces/IItems';
 import ADN from '../services/adn';
+import Crunchyroll from '../services/crunchyroll';
 import webhook from '../utils/webhook';
 
 export default async function episodes(
@@ -10,18 +11,16 @@ export default async function episodes(
 ): Promise<void> {
   const { DB, WEBHOOK_URL } = env;
 
-  const episodesAnnouncedCache = await DB.get('announced');
-  let episodesAnnounced: Array<IEpisode | IMovie>;
-
-  if (episodesAnnouncedCache) episodesAnnounced = JSON.parse(episodesAnnouncedCache);
-  else episodesAnnounced = [];
+  let episodesAnnounced: Array<IMovie | IEpisode> = await DB.get('announced', 'json');
+  if (!episodesAnnounced) episodesAnnounced = [];
 
   episodesAnnounced = episodesAnnounced.filter((v) =>
     new Date().getTime() < (new Date(v.outDate).getTime() + 1000 * 60 * 60 * 24)
   );
 
   const episodesResult = await Promise.allSettled([
-    ADN.getEpisodesOfTheDay()
+    ADN.getEpisodesOfTheDay(),
+    new Crunchyroll(DB).getLatestEpisodes()
   ]);
 
   const sortedEpisodes: Record<string, any> = {};
@@ -35,7 +34,7 @@ export default async function episodes(
 
       if (WEBHOOK_URL) {
         if (episode.type === 'EPISODE' || episode.type === 'OAV') {
-          if (sortedEpisodes[`${episode.type}:${episode.animeId}`]) {
+          if (sortedEpisodes[`${episode.type as string}:${episode.animeId as string}`]) {
             sortedEpisodes[episode.animeId].episodes.push({
               number: episode.episode || 1,
               url: episode.episodeUrl
@@ -90,19 +89,19 @@ export default async function episodes(
           inline: true
         });
       } else {
-        const fieldTitle = `❗ ${sortedEpisode.episodes.lentgth > 1 ? 'Nouveaux' : 'Nouvel'} ` +
+        const fieldTitle = `❗ ${sortedEpisode.episodes.length > 1 ? 'Nouveaux' : 'Nouvel'} ` +
                            `${sortedEpisode.type === 'EPISODE' ? 'épisode' : 'OAV'}` +
-                           `${sortedEpisode.episodes.lentgth > 1 ? 's' : ''} ` +
+                           `${sortedEpisode.episodes.length > 1 ? 's' : ''} ` +
                            'disponible';
-        const fieldValueTitle = sortedEpisode.episodes.lentgth > 1
+        const fieldValueTitle = sortedEpisode.episodes.length > 1
           ? `Regarder les épisodes ${Math.min(...sortedEpisode.episodes.map((v: any) => v.number))} ` +
             `à ${Math.max(...sortedEpisode.episodes.map((v: any) => v.number))}`
-          : `Regarder l'épisode ${sortedEpisode.episodes[0].number as number}`;
+          : `Regarder l'épisode ${sortedEpisode.episodes[0].number as (number | string)}`;
 
         webhook.fields.push({
           name: fieldTitle,
           value: `- **[${fieldValueTitle}](${(
-            sortedEpisode.episodes.lentgth > 1 ? sortedEpisode.url : sortedEpisode.episodes[0].url
+            sortedEpisode.episodes.length > 1 ? sortedEpisode.url : sortedEpisode.episodes[0].url
             ) as string})**`,
           inline: true
         });

@@ -1,7 +1,7 @@
 import { type IMovie, type IEpisode } from '../interfaces/IItems';
 
 export default class ADN {
-  private static readonly BASE_URL = 'https://gw.api.animationdigitalnetwork.fr';
+  private static readonly API_BASE_URL = 'https://gw.api.animationdigitalnetwork.fr';
   private static readonly EPISODE_TYPES = ['EPS', 'OAV'];
   private static readonly MOVIE_TYPES = ['MOVIE'];
 
@@ -9,21 +9,21 @@ export default class ADN {
     const currentDate = new Date();
 
     const req: Response | null = await fetch(
-      `${ADN.BASE_URL}/video/calendar?date=` +
+      `${ADN.API_BASE_URL}/video/calendar?date=` +
       `${currentDate.getFullYear()}-` +
       `${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-` +
       `${currentDate.getDay().toString().padStart(2, '0')}`
     )
       .catch(() => null);
 
-    if (!req || req.status !== 200) return [];
+    if (!req || req.status !== 200) throw new Error('Unable to get new episodes');
 
     const data: Record<string, any> = await req.json();
 
     const episodes: Array<IMovie | IEpisode> = [];
 
     for (const episodeData of data.videos) {
-      if (new Date(episodeData.releaseDate) < new Date()) continue;
+      if (new Date(episodeData.releaseDate) > new Date()) continue;
       if (![...this.EPISODE_TYPES, ...this.MOVIE_TYPES].includes(episodeData.type)) continue;
 
       let shortNumber = episodeData.shortNumber;
