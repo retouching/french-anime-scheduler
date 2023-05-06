@@ -9,7 +9,7 @@ export default async function episodes(
   env: IEnvironment,
   _ctx: ExecutionContext
 ): Promise<void> {
-  const { DB, WEBHOOK_URL } = env;
+  const { DB, WEBHOOK_URL, MENTIONS } = env;
 
   let episodesAnnounced: Array<IMovie | IEpisode> = await DB.get('announced', 'json');
   if (!episodesAnnounced) episodesAnnounced = [];
@@ -113,12 +113,20 @@ export default async function episodes(
       webhooks.push(webhook);
     }
 
+    let content = '';
+
+    if (MENTIONS && MENTIONS.length > 0) {
+      for (const mention of MENTIONS.split(',').map((m) => m.trim())) {
+        content += ` <@&${mention}>`;
+      }
+    }
+
     const chunkedWebhooks = [].concat.apply([],
       webhooks.map((_, i) => i % 5 ? [] : [webhooks.slice(i, i + 5)]) as any
     );
 
     for (const chunkedWebhook of chunkedWebhooks) {
-      await webhook.send(WEBHOOK_URL, { embeds: chunkedWebhook });
+      await webhook.send(WEBHOOK_URL, { content, embeds: chunkedWebhook });
     }
   }
 
