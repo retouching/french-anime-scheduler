@@ -23,9 +23,18 @@ export default async function rss(
   const rssFooter = '</channel></rss>';
 
   for (const item of episodesAnnounced) {
-    let itemRSS = '<item>';
+    let itemRSS = '<item>' +
+                  `<title>${item.anime} - ` +
+                  `${item.type === 'MOVIE' ? item.animeYear : String(item.episode).padStart(2, '0')}` +
+                  '</title>' +
+                  `<description>${item.animeDescription}</description>` +
+                  `<category>${item.type}</category>` +
+                  `<guid isPermalink="true">${item.episodeUrl}</guid>` +
+                  `<link>${item.episodeUrl}</link>` +
+                  `<enclosure url="${item.animeImage}" type="image/jpeg"/>`;
 
     for (const key in item) {
+      if (['anime', 'episode', 'animeYear', 'animeDescription', 'type', 'episodeUrl'].includes(key)) continue;
       itemRSS += `<fas:${key}>${(item as unknown as Record<string, string | number>)[key] || ''}</fas:${key}>`;
     }
 
