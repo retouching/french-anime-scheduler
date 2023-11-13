@@ -1,0 +1,14 @@
+name = "french-anime-scheduler"
+workers_dev = false
+main = "src/index.ts"
+compatibility_date = "2023-06-05"
+kv_namespaces = [
+  { binding = "DB", id = "xxx", preview_id = "xxx" }
+]
+
+[vars]
+WEBHOOK_URL = "https://discord.com/api/webhooks/xxx/xxx"
+MENTIONS = "xxx,xxx"
+
+[triggers]
+crons = ["1,6,11,16,21,26,31,36,41,46,51,56 * * * *"]
