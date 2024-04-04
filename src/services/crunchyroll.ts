@@ -2,7 +2,7 @@ import { type IEpisode } from '../interfaces/IItems';
 
 export default class Crunchyroll {
   private static readonly APP_USER_AGENT = 'Crunchyroll/3.32.3 Android/11 okhttp/4.9.2';
-  private static readonly APP_BASIC_AUTH = 'Basic c2ZjOWYtLXEyYzJ2YWE1eW1zbHo6cThiVk5SYmp2c1g5ZGJwdDV5eTl5TXhjakNRMXgteU0=';
+  private static readonly APP_BASIC_AUTH = 'Basic Y3Jfd2ViOg==';
   private static readonly API_BASE_URL = 'https://beta-api.crunchyroll.com';
   private static readonly FRONT_BASE_URL = 'https://www.crunchyroll.com';
   private static readonly FRENCH_LANG_CODE = 'fr-FR';
